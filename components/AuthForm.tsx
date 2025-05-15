@@ -1,14 +1,13 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FieldValues, SubmitHandler, useForm, UseFormReturn, DefaultValues } from "react-hook-form";
-import { z, ZodType } from "zod";
-
+import { FieldValues, SubmitHandler, useForm, UseFormReturn, DefaultValues, Path } from "react-hook-form";
+import {  ZodType } from "zod";
+import { FIELD_TYPES } from "@/app/constants";
 import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -18,6 +17,8 @@ import { Input } from "@/components/ui/input"
 import Link from "next/link";
 import { FIELD_NAMES } from "@/app/constants";
 import ImageUpload from "./ImageUpload";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface Props <T extends FieldValues>{
   schema: ZodType<T>;
@@ -31,6 +32,7 @@ const AuthForm = <T extends FieldValues> ({
   schema, 
   defaultValues, 
   onSubmit}: Props<T>) => {
+    const router = useRouter();
     const isSignIn = type === "SIGN_IN";
   
   const form: UseFormReturn<T> = useForm({
@@ -40,7 +42,23 @@ const AuthForm = <T extends FieldValues> ({
   })
  
   // 2. Define a submit handler.
-  const handleSubmit: SubmitHandler<T> = async(data) => {};
+  const handleSubmit: SubmitHandler<T> = async(data) => {
+    const result = await onSubmit(data);
+  if (result.success) {
+    toast.success(
+      isSignIn
+        ? "You have successfully signed in"
+        : "You have successfully signed up"
+  );
+  router.push("/");
+  }else {
+    toast.error(
+      isSignIn
+        ? "Error signing in"
+        : "Error signing up"
+    );
+  }
+};
 
   return (
   <div className="flex flex-col gap-4">
@@ -55,23 +73,23 @@ const AuthForm = <T extends FieldValues> ({
 
         {Object.keys(defaultValues).map((field) => (
           <FormField
+          key={field}
           control={form.control}
-          name={field as path <T>}
+          name={field as Path<T>}
           render={({ field }) => (
             <FormItem>
               <FormLabel className="capitalize">{FIELD_NAMES[field.name as keyof typeof FIELD_NAMES]}</FormLabel>
               <FormControl>
-                  {field.name === universityCard ? (<ImageUpload />) : (<Input required type={FIELD_TYPES[field.name as keyof typeof FIELD_TYPES]} {...field} className="form-input"/>)}
+                  {field.name === "universityCard" ? (<ImageUpload onFileChange={field.onChange}/>) : 
+                  (<Input required type={FIELD_TYPES[field.name as keyof typeof FIELD_TYPES]} {...field} className="form-input"/>)}
               </FormControl>
-              <FormDescription>
-                This is your public display name.
-              </FormDescription>
+              
               <FormMessage />
             </FormItem>
           )}
         />
         ))}
-        <Button type="submit">Submit</Button>
+        <Button type="submit" className="form-btn">{isSignIn ? "SignIn" : "Sign Up"}</Button>
       </form>
     </Form>
 
@@ -87,5 +105,4 @@ const AuthForm = <T extends FieldValues> ({
     </div>
   )
 }
-
 export default AuthForm;
