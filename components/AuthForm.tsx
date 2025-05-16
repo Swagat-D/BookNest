@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { FieldValues, SubmitHandler, useForm, UseFormReturn, DefaultValues, Path } from "react-hook-form";
 import {  ZodType } from "zod";
 import { FIELD_TYPES } from "@/app/constants";
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/Button"
 import {
   Form,
   FormControl,

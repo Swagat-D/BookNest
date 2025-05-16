@@ -3,7 +3,7 @@ import BookCover from './BookCover';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
-import { Button } from './ui/button';
+import { Button } from './ui/Button';
 
 const Bookcard = ({id, title, genre, coverColor, coverUrl, isLoanedbook=false,}: Book) => 
 <li className={cn(isLoanedbook && "xs:w-52 w-full")}>

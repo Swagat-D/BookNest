@@ -1,4 +1,6 @@
+// File: lib/actions/auth.ts
 "use server";
+
 import { eq } from "drizzle-orm";
 import { db } from "@/database/drizzle";
 import { users } from "@/database/schema";
@@ -9,27 +11,32 @@ export const signInWithCredentials = async (params: Pick<AuthCredentials, "email
   const { email, password } = params;
 
   try {
-    const result  = await signIn("credentials", {
+    // Pass the correct parameters that match the credentials provider
+    const result = await signIn("credentials", {
       email,
       password,
       redirect: false,
-    })
+    });
+    
     if (result?.error) {
+      console.log("Sign in error:", result.error);
       return { success: false, message: result.error };
     }
 
     return { success: true, message: "Sign in successful" };
-  }catch (error) {
-    console.log(error, "Sign in error");
+  } catch (error) {
+    console.log("Sign in exception:", error);
     return { success: false, message: "Error signing in" };
   }
-}
+};
+
 export const signup = async (
   params: AuthCredentials
 ): Promise<{ success: boolean; error?: string }> => {
   const { fullName, email, password, universityId, universityCard } = params;
 
   try {
+    // Check if user exists
     const existingUser = await db
       .select()
       .from(users)
@@ -40,6 +47,7 @@ export const signup = async (
       return { success: false, error: "User already exists" };
     }
 
+    // Hash password and create user
     const hashedPassword = await hash(password, 10);
 
     await db.insert(users).values({
@@ -50,16 +58,16 @@ export const signup = async (
       universityCard,
     });
 
+    // Sign in the newly created user
     const signInResult = await signInWithCredentials({ email, password });
 
     if (!signInResult.success) {
       return { success: false, error: signInResult.message || "Sign in failed" };
     }
 
-    return { success: true }; // ✅ Always return consistent object
+    return { success: true };
   } catch (error) {
     console.error("Signup error:", error);
     return { success: false, error: "Error creating user" };
   }
 };
-
