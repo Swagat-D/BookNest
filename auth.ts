@@ -7,7 +7,6 @@ import { users } from "@/database/schema"
 import { compare } from "bcryptjs"
  
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  debug: true, // Enable debug mode to see more detailed logs
   session: {
     strategy: "jwt",
   },
