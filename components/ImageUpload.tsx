@@ -5,11 +5,10 @@ import React, { useRef, useState } from 'react'
 import Image from 'next/image';
 import { IKImage, ImageKitProvider, IKUpload } from "imagekitio-next";
 import config from "@/lib/config";
-import { error } from 'console';
 import { toast } from 'sonner';
 
 
-const {env: { imagekit: { publicKey, privateKey, urlEndpoint }}} = config;
+const {env: { imagekit: { publicKey, urlEndpoint }}} = config;
 
 
 const authenticator = async() => {

@@ -3,9 +3,11 @@ import BookCover from './BookCover';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
-import { Button } from './ui/Button';
+import { Button } from './ui/button';
 
-const Bookcard = ({id, title, genre, coverColor, coverUrl, isLoanedbook=false,}: Book) => 
+type BookcardProps = Book & { isLoanedbook?: boolean };
+
+const Bookcard = ({id, title, genre, coverColor, coverUrl, isLoanedbook = false}: BookcardProps) => 
 <li className={cn(isLoanedbook && "xs:w-52 w-full")}>
 
   <Link href={`/books/${id}`} 

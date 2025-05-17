@@ -1,6 +1,6 @@
 import React from 'react'
 import Image from 'next/image';
-import { Button } from './ui/Button';
+import { Button } from './ui/button';
 import BookCover from './BookCover';
 
 const BookOverview = ({title, author, genre, rating, totalCopies, availableCopies, description, coverColor, coverUrl}: Book) => {
