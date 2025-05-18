@@ -1,4 +1,3 @@
-// File: lib/actions/auth.ts
 "use server";
 
 import { eq } from "drizzle-orm";
@@ -9,14 +8,16 @@ import { signIn } from "@/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import ratelimit from "../ratelimit";
+import { workflowClient } from "../workflow";
+import config from "../config";
 
 export const signInWithCredentials = async (params: Pick<AuthCredentials, "email" | "password">) => {
   const { email, password } = params;
 
-const ip = (await headers()).get('x-forward-for') || '127.0.0.1';
-const { success } = await ratelimit.limit(ip);
+  const ip = (await headers()).get('x-forward-for') || '127.0.0.1';
+  const { success } = await ratelimit.limit(ip);
 
-if (!success) return redirect ('/too-fast');
+  if (!success) return redirect('/too-fast');
 
   try {
     // Pass the correct parameters that match the credentials provider
@@ -43,10 +44,10 @@ export const signup = async (
 ): Promise<{ success: boolean; error?: string }> => {
   const { fullName, email, password, universityId, universityCard } = params;
 
-const ip = (await headers()).get('x-forward-for') || '127.0.0.1';
-const { success } = await ratelimit.limit(ip);
+  const ip = (await headers()).get('x-forward-for') || '127.0.0.1';
+  const { success } = await ratelimit.limit(ip);
 
-if (!success) return redirect ('/too-fast');
+  if (!success) return redirect('/too-fast');
 
   try {
     // Check if user exists
@@ -69,6 +70,15 @@ if (!success) return redirect ('/too-fast');
       password: hashedPassword,
       universityId,
       universityCard,
+    });
+
+    // Trigger the onboarding workflow
+    await workflowClient.trigger({
+      url: `${config.env.prodApiEndpoint}/api/workflow/onboarding`,
+      body: {
+        email,
+        fullName,
+      },
     });
 
     // Sign in the newly created user
