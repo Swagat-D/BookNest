@@ -25,7 +25,7 @@ export const sendEmail = async ({
   try {
     // Using QStash to schedule email sending through EmailJS
     await qstashClient.publishJSON({
-      url: `${config.env.prodApiEndpoint}/api/email/send`,
+      url: `${config.env.prodApiEndpoint}/api/send-email`,
       body: {
         email,
         subject,
